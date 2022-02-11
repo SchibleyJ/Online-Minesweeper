@@ -41,7 +41,7 @@ html, body {
     height: 50vh;
     border-radius: 40px;
     /* Could be more or less, depending on screen size */
-    font-size: 5vw;
+    /*font-size: 5vw;*/
     color: black;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 

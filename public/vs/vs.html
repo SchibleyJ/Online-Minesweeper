@@ -1,55 +1,74 @@
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Document</title>
     <link rel='stylesheet' href='vs.css'>
 </head>
+
 <body>
     <div id='start' class='hidden'>
-    <div id='start-choice'>
-        <input type='button' value='Create a Game' onclick='createGameCss()'>
-        <input type='button' value='Join a Game' onclick='joinGameCss()'>
-    </div>
-    
-    <div id='create-modal' class='modal'>
-        <div class='modal-content'>
-            <span id='close-create' class="close">&times;</span>
-            <div id='create-options'>
-                <div>Size: S/M/L</div>
-                <div>No Guesses: ON/OFF</div>
-                <div>
-                    Name:
-                    <input type='text'>
+        <div id='start-choice'>
+            <input type='button' value='Create a Game' onclick='createGameCss()'>
+            <input type='button' value='Join a Game' onclick='joinGameCss()'>
+        </div>
+
+        <div id='create-modal' class='modal'>
+            <div class='modal-content'>
+                <span id='close-create' class="close">&times;</span>
+                <div id='create-options'>
+                    <form>
+                        <div>Size:
+                            <input type='radio' id='small' value='0' name='size'>
+                            <label for='small'>Small</label>
+                            <input type='radio' id='medium' value='1' name='size'>
+                            <label for='medium'>Medium</label>
+                            <input type='radio' id='large' value='2' name='size'>
+                            <label for='large'>Large</label>
+
+                        </div>
+                        <div>No Guesses:
+                            <input type='radio' id='on' name='guesses'>
+                            <label for='on'>On</label>
+                            <input type='radio' id='off' name='guesses'>
+                            <label for='off'>Off</label>
+
+                        </div>
+                        <div>
+                            Name:
+                            <input id="create-name" type='text'>
+                        </div>
+                        <input type='button' value='Create' onclick='createGame()'>
+                    </form>
                 </div>
-                <input type='button' value='Create'>
             </div>
         </div>
-    </div>
 
-    
 
-    <div id='join-modal' class='modal'>
-        <div class='modal-content'>
-            <span id='close-join' class="close">&times;</span>
-            <div id='join-options'>
-                <div>
-                    Name:
-                    <input type='text'>
+
+        <div id='join-modal' class='modal'>
+            <div class='modal-content'>
+                <span id='close-join' class="close">&times;</span>
+                <div id='join-options'>
+                    <div>
+                        Name:
+                        <input type='text'>
+                    </div>
+                    <div>
+                        Code:
+                        <input type='text'>
+                    </div>
+                    <input type='button' value='Join'>
                 </div>
-                <div>
-                    Code:
-                    <input type='text'>
-                </div>
-                <input type='button' value='Join'>
             </div>
         </div>
-    </div>
 
-</div>
+    </div>
     <div id='game' class='hidden'>
     </div>
 </body>
 <script src="vs.js"></script>
+
 </html>
