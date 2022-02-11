@@ -6,7 +6,7 @@ const port = process.env.PORT || 8080;
 
 const Board = require('./board.js')
 
-const vsGames = {};
+const coopGames = {};
 
 const wss = new WebSocket.Server({ server: server, path: '/transfer' });
 
