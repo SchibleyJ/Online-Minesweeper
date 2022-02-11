@@ -1,26 +1,32 @@
+const code = (new URLSearchParams(window.location.search)).get('id');
+if (code === null){
+    document.getElementById('start').classList.remove('hidden')
+} else {
+    document.getElementById('game').classList.remove('hidden')
+}
+
+// CSS EDITIING
 let createModal = document.getElementById('create-modal');
 let joinModal = document.getElementById('join-modal');
 let startChoice = document.getElementById('start-choice')
-    
-const createGameCss = () => {
-    //startChoice.classList.add('hidden')
+let closeCreate = document.getElementById("close-create");
+let closeJoin = document.getElementById("close-join");  
 
+const createGameCss = () => {
     createModal.style.display = 'block';
 }
 
 const joinGameCss = () => {
-    //startChoice.classList.add('hidden')
-
-    joinModal.style.display = 'block';
+     joinModal.style.display = 'block';
 }
 
-let span = document.getElementById("close");
-span.onclick = function () {
-    joinModal.style.display = "none";
+closeCreate.onclick = function () {
     createModal.style.display = "none";
-    startChoice.classList.remove('hidden')
-
 }
+closeJoin.onclick = function () {
+    joinModal.style.display = "none";
+}
+
 
 window.onclick = function (event) {
     if (event.target == createModal || event.target == joinModal) {
@@ -30,3 +36,5 @@ window.onclick = function (event) {
 
     }
 }
+
+// GAME SCRIPT

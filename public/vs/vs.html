@@ -7,6 +7,7 @@
     <link rel='stylesheet' href='vs.css'>
 </head>
 <body>
+    <div id='start' class='hidden'>
     <div id='start-choice'>
         <input type='button' value='Create a Game' onclick='createGameCss()'>
         <input type='button' value='Join a Game' onclick='joinGameCss()'>
@@ -14,8 +15,8 @@
     
     <div id='create-modal' class='modal'>
         <div class='modal-content'>
-            <span id='close'>&times;</span>
-            <div id='create-options' class='hidden'>
+            <span id='close-create' class="close">&times;</span>
+            <div id='create-options'>
                 <div>Size: S/M/L</div>
                 <div>No Guesses: ON/OFF</div>
                 <div>
@@ -31,8 +32,8 @@
 
     <div id='join-modal' class='modal'>
         <div class='modal-content'>
-            <span id='close'>&times;</span>
-            <div id='join-options' class='hidden'>
+            <span id='close-join' class="close">&times;</span>
+            <div id='join-options'>
                 <div>
                     Name:
                     <input type='text'>
@@ -46,9 +47,8 @@
         </div>
     </div>
 
-    
-    <div>
-        <!-- game div -->
+</div>
+    <div id='game' class='hidden'>
     </div>
 </body>
 <script src="vs.js"></script>
