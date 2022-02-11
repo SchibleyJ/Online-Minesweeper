@@ -1,8 +1,11 @@
 const code = (new URLSearchParams(window.location.search)).get('id');
+const ws = new WebSocket(`ws${location.protocol == "https:" ? 's' : ''}://${location.host}/transfer`);
+
 if (code === null){
     document.getElementById('start').classList.remove('hidden')
 } else {
     document.getElementById('game').classList.remove('hidden')
+    
 }
 
 // CSS EDITIING
@@ -38,3 +41,11 @@ window.onclick = function (event) {
 }
 
 // GAME SCRIPT
+
+ws.onopen = () => {
+    console.log('ws opened')
+}
+
+ws.onmessage = (e) => {
+    console.log((e.data));
+}
