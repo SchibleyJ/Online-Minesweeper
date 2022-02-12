@@ -36,26 +36,24 @@
                             <label for='off'>Off</label>
 
                         </div>
-                        <div>
+                        <!--<div>
                             Name:
                             <input id="create-name" type='text'>
-                        </div>
+                        </div>-->
                         <input type='button' value='Create' onclick='createGame()'>
                     </form>
                 </div>
             </div>
         </div>
 
-
-
         <div id='join-modal' class='modal'>
             <div class='modal-content'>
                 <span id='close-join' class="close">&times;</span>
                 <div id='join-options'>
-                    <div>
+                    <!--<div>
                         Name:
                         <input id='join-name' type='text'>
-                    </div>
+                    </div>-->
                     <div>
                         Code:
                         <input id='join-code' type='text'>
@@ -65,21 +63,20 @@
             </div>
         </div>
 
-        <div id='link-modal' class='modal'>
-            <div class='modal-content'>
-                <div id='link-options'>
-                    <div>
-                        Name:
-                        <input id='join-name' type='text'>
-                    </div>
-                    <input type='button' value='Play' onclick='linkJoinGame()'>
+    </div>
+    <div id='name-modal' class='modal'>
+        <div class='modal-content'>
+            <div id='name-options'>
+                <div>
+                    Name:
+                    <input id='name' type='text'>
                 </div>
+                <input type='button' value='Play' onclick='setName()'>
             </div>
         </div>
-
     </div>
     <div id='game' class='hidden'>
-        <canvas id='board' width='800px' height = '520px' oncontextmenu="event.preventDefault()">
+        <canvas id='board' width='800px' height='520px' oncontextmenu="event.preventDefault()">
 
         </canvas>
     </div>
