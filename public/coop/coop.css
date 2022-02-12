@@ -61,3 +61,9 @@ html, body {
     text-decoration: none;
     cursor: pointer;
 }
+
+canvas{
+    border: 1px solid black;
+    aspect-ratio: 800/520;;
+    height: 90vh;
+}

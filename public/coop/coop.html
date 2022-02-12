@@ -5,7 +5,7 @@
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <title>Document</title>
-    <link rel='stylesheet' href='vs.css'>
+    <link rel='stylesheet' href='coop.css'>
 </head>
 
 <body>
@@ -54,21 +54,36 @@
                 <div id='join-options'>
                     <div>
                         Name:
-                        <input type='text'>
+                        <input id='join-name' type='text'>
                     </div>
                     <div>
                         Code:
-                        <input type='text'>
+                        <input id='join-code' type='text'>
                     </div>
-                    <input type='button' value='Join'>
+                    <input type='button' value='Join' onclick='joinGame()'>
+                </div>
+            </div>
+        </div>
+
+        <div id='link-modal' class='modal'>
+            <div class='modal-content'>
+                <div id='link-options'>
+                    <div>
+                        Name:
+                        <input id='join-name' type='text'>
+                    </div>
+                    <input type='button' value='Play' onclick='linkJoinGame()'>
                 </div>
             </div>
         </div>
 
     </div>
     <div id='game' class='hidden'>
+        <canvas id='board' width='800px' height = '520px' oncontextmenu="event.preventDefault()">
+
+        </canvas>
     </div>
 </body>
-<script src="vs.js"></script>
+<script src="coop.js"></script>
 
 </html>

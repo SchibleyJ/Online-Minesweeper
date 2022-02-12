@@ -19,11 +19,21 @@ wss.on('connection', (client) => {
         switch (message.messageType){
             case 0:
                 let id = Math.floor(Math.random() * 1000);
-                vsGames[id] = new Board(id, message.body.width, message.body.height, message.body.bombs);
+                coopGames[id] = new Board(id, message.body.width, message.body.height, message.body.bombs);
                 client['userData'] = { gameId: id}
+                client.send(JSON.stringify({messageType: 0, body: { id: id }}));
+                break;
+            case 1:
+                if (coopGames[message.body.id]){
+                    client['userData'] = { gameId: message.body.id}
+                    client.send(JSON.stringify({messageType: 0, body: { id: message.body.id }}));    
+                } else {
+                    client.send(JSON.stringify({messageType: 1, body: "Game not found." }));    
+                    
+                }
                 break;
         }
-        client.send(JSON.stringify(vsGames[client['userData']['gameId']].bombs))
+        
     })
 
 })
