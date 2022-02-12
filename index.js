@@ -25,20 +25,21 @@ wss.on('connection', (client) => {
                 client.send(JSON.stringify({ messageType: 0, body: { id: id } }));
                 break;
             case 1:
-                if (coopGames[message.body.id]) {
-                    client['userData'] = { name: message.body.name, gameId: message.body.id }
-                    client.send(JSON.stringify({
-                        messageType: 1, body: {
-                            bombs: coopGames[message.body.id].bombs,
-                            surroundings: coopGames[message.body.id].surroundings,
-                            clicks: coopGames[message.body.id].clicks,
-                            flags: coopGames[message.body.id].flags
-                        }
-                    }));
-                } else {
-                    // client.send(JSON.stringify({ messageType: 1, body: "Game not found." }));
+                client['userData'] = { name: message.body.name, gameId: message.body.id }
+                client.send(JSON.stringify({
+                    messageType: 1, body: {
+                        bombs: coopGames[message.body.id].bombs,
+                        surroundings: coopGames[message.body.id].surroundings,
+                        clicks: coopGames[message.body.id].clicks,
+                        flags: coopGames[message.body.id].flags,
+                        width: coopGames[message.body.id].width,
+                        height: coopGames[message.body.id].height
+                    }
+                }));
 
-                }
+                break;
+            case 2:
+                client.send(JSON.stringify({ messageType: 2, body: (coopGames[message.body.id] != undefined) }));
                 break;
 
 

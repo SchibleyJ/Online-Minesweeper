@@ -11,6 +11,14 @@ let startChoice = document.getElementById('start-choice')
 let closeCreate = document.getElementById("close-create");
 let closeJoin = document.getElementById("close-join");
 
+let bombs;
+let surroundings;
+let clicks;
+let flags;
+let boardWidth;
+let boardHeight;
+
+
 const createGameCss = () => {
     createModal.style.display = 'block';
 }
@@ -44,9 +52,8 @@ ws.onopen = () => {
     if (code === null) {
         document.getElementById('start').classList.remove('hidden')
     } else {
-        document.getElementById('game').classList.remove('hidden')
-        nameModal.style.display = 'block';
-        //ws.send(JSON.stringify({ messageType: 2, body: { id: code } }))
+        ws.send(JSON.stringify({ messageType: 2, body: { id: code } }));
+
     }
 }
 
@@ -59,13 +66,25 @@ ws.onmessage = (e) => {
             break;
         case 1:
             console.log(message.body);
+            bombs = message.body.bombs;
+            surroundings = message.body.surroundings;
+            clicks = message.body.clicks;
+            flags = message.body.flags;
+            boardWidth = message.body.width;
+            boardHeight = message.body.height;
+
+            loadBoard();
             break;
         case 2:
-            linkModal.style.display = 'block';
+            if (!message.body) {
+                alert("This game id does not exist.")
+                window.location.href = location.href.substring(0, location.href.indexOf("?"));
+            } else {
+                document.getElementById('game').classList.remove('hidden')
+                nameModal.style.display = 'block';
+            }
             break;
-        case 3:
-            console.log('here');
-            break;
+
     }
 }
 
@@ -91,14 +110,10 @@ const createGame = () => {
     }
     //let guesses = document.querySelector('input[name="guesses"]:checked').value;
     let guesses = true;
-    //let name = document.getElementById('create-name').value;
-    ws.send(JSON.stringify({ messageType: 0, body: { width: width, height: height, bombs: bombs, guesses: guesses, name: name } }))
+    ws.send(JSON.stringify({ messageType: 0, body: { width: width, height: height, bombs: bombs, guesses: guesses } }))
 }
 
 const joinGame = () => {
-    //let name = document.getElementById('join-name').value;
-    //let id = document.getElementById('join-code').value;
-    //ws.send(JSON.stringify({ messageType: 1, body: { name: name, id: id } }))
     let id = document.getElementById('join-code').value;
     window.location.href = `${location.href}?id=${id}`;
 }
@@ -115,15 +130,18 @@ const setName = () => {
 const canv = document.getElementById('board');
 const ctx = canv.getContext('2d');
 
-ctx.rect(100, 100, 600, 320);
-ctx.stroke();
+const loadBoard = () => {
+    ctx.rect(100, 100, 600, 320);
+    ctx.stroke();
 
-for (let i = 100; i < 700; i += 20) {
-    for (let j = 100; j < 420; j += 20) {
-        drawSquare(i, j, 0);
+    for (let i = 100; i < 100 + (boardWidth * 20); i += 20) {
+        for (let j = 100; j < 100 + (boardHeight * 20); j += 20) {
+            drawSquare(i, j, 0);
+        }
     }
+    ctx.stroke();
+
 }
-ctx.stroke();
 
 function drawSquare(x, y, value) {
     let sprite = new Image;
