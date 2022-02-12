@@ -134,20 +134,55 @@ const loadBoard = () => {
     ctx.rect(100, 100, 600, 320);
     ctx.stroke();
 
-    for (let i = 100; i < 100 + (boardWidth * 20); i += 20) {
-        for (let j = 100; j < 100 + (boardHeight * 20); j += 20) {
-            drawSquare(i, j, 0);
+    for (let i = 0; i < boardWidth; i++) {
+        for (let j = 0; j < boardHeight; j++) {
+            drawSquare(i, j);
         }
     }
     ctx.stroke();
 
 }
 
-function drawSquare(x, y, value) {
+canv.addEventListener('mousedown', (event) => {
+    let rect = canv.getBoundingClientRect(); // abs. size of element
+    let scaleX = canv.width / rect.width;    // relationship bitmap vs. element for X
+    let scaleY = canv.height / rect.height;  // relationship bitmap vs. element for Y
+    let mouseX = (event.clientX - rect.left) * scaleX;   // scale mouse coordinates after they have
+    let mouseY = (event.clientY - rect.top) * scaleY;     // been adjusted to be relative to element
+
+    let x = Math.floor((mouseX - 100) / 20);
+    let y = Math.floor((mouseY - 100) / 20);
+    if (event.button === 0){
+        ws.send(JSON.stringify({messageType: 3, body: {id: code, x: x, y: y}}))
+    }
+    if (event.button === 2){
+        ws.send(JSON.stringify({messageType: 4, body: {id: code, x: x, y: y}}))
+    }
+    
+})
+
+
+
+function drawSquare(x, y) {
+    let isClicked = clicks[y][x];
+    let isBomb = bombs[y][x];
+    let surrouding = surroundings[y][x];
+    let isFlagged = flags[y][x];
     let sprite = new Image;
-    sprite.src = '/sprites/TileUnknown.png';
+    if (!isClicked){
+        if (isFlagged){
+            sprite.src = '/sprites/TileFlag.png';
+        } else {
+            sprite.src = '/sprites/TileUnknown.png';
+        }
+    } else if (isBomb) {
+            sprite.src = '/sprites/TileMine.png';
+    } else {
+        sprite.src = `/sprites/Tile${surrouding}.png`;
+    }
+
     sprite.onload = () => {
-        ctx.drawImage(sprite, x, y, 20, 20)
+        ctx.drawImage(sprite, x * 20 + 100, y * 20 + 100, 20, 20)
     }
 }
 

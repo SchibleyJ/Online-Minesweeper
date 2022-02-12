@@ -1,3 +1,16 @@
+//https://stackoverflow.com/questions/1738128/minesweeper-solving-algorithm
+
+/* TODO
+implement starting fixes from link above
+add colored flags based on player
+add num of mines remaining (based on flags put down)
+add timer
+consider solvable board (starting with above link)
+if you hate yourself, better html/css, keep the artstyle
+
+*/
+
+
 //websocket server 
 const WebSocket = require('ws');
 const server = require('http').createServer();
@@ -5,7 +18,7 @@ const app = require('./httpServer.js');
 const port = process.env.PORT || 8080;
 
 const Board = require('./board.js');
-const res = require('express/lib/response');
+const floodFill = require('./floodFill.js');
 
 const coopGames = {};
 
@@ -40,6 +53,50 @@ wss.on('connection', (client) => {
                 break;
             case 2:
                 client.send(JSON.stringify({ messageType: 2, body: (coopGames[message.body.id] != undefined) }));
+                break;
+            case 3:
+                let xClick = message.body.x;
+                let yClick = message.body.y;
+                if (!coopGames[message.body.id].clicks[yClick][xClick] && !coopGames[message.body.id].flags[yClick][xClick]) {
+                    console.log('here')
+                    floodFill(xClick, yClick, coopGames[message.body.id].clicks, coopGames[message.body.id].surroundings)
+                    wss.clients.forEach(_client => {
+                        if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {
+                            _client.send(JSON.stringify({
+                                messageType: 1, body: {
+                                    bombs: coopGames[message.body.id].bombs,
+                                    surroundings: coopGames[message.body.id].surroundings,
+                                    clicks: coopGames[message.body.id].clicks,
+                                    flags: coopGames[message.body.id].flags,
+                                    width: coopGames[message.body.id].width,
+                                    height: coopGames[message.body.id].height
+                                }
+                            }));
+                        }
+                    })
+
+                }
+                break;
+            case 4:
+                let xFlag = message.body.x;
+                let yFlag = message.body.y;
+                console.log('here')
+                coopGames[message.body.id].flags[yFlag][xFlag] = !coopGames[message.body.id].flags[yFlag][xFlag];
+                wss.clients.forEach(_client => {
+                    if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {
+                        _client.send(JSON.stringify({
+                            messageType: 1, body: {
+                                bombs: coopGames[message.body.id].bombs,
+                                surroundings: coopGames[message.body.id].surroundings,
+                                clicks: coopGames[message.body.id].clicks,
+                                flags: coopGames[message.body.id].flags,
+                                width: coopGames[message.body.id].width,
+                                height: coopGames[message.body.id].height
+                            }
+                        }));
+                    }
+                })
+
                 break;
 
 
