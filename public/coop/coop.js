@@ -167,11 +167,11 @@ function drawSquare(x, y) {
     let isClicked = clicks[y][x];
     let isBomb = bombs[y][x];
     let surrouding = surroundings[y][x];
-    let isFlagged = flags[y][x];
+    let flag = flags[y][x];
     let sprite = new Image;
     if (!isClicked){
-        if (isFlagged){
-            sprite.src = '/sprites/TileFlag.png';
+        if (flag !== 0){
+            sprite.src = `/sprites/TileFlag${flag}.png`;
         } else {
             sprite.src = '/sprites/TileUnknown.png';
         }

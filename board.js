@@ -4,16 +4,17 @@ class Board {
         this.width = width;
         this.height = height;
         this.numBombs = bombs;
-        this.bombs = this.createBombs();
-        this.surroundings = this.createSurrounding(this.bombs);
-        this.clicks = this.createClicks();
-        this.flags = this.createFlags();
+        this.bombs = this.#createBombs();
+        this.surroundings = this.#createSurrounding(this.bombs);
+        this.clicks = this.#createClicks();
+        this.flags = this.#createFlags();
+        this.clients = [];
 
 
     }
 
     
-    createBombs = () => {
+    #createBombs = () => {
         let bombs = [...Array(this.height)].map(x=>Array(this.width).fill(false))
 
         for (let i = 0; i < this.numBombs; i++){
@@ -29,7 +30,7 @@ class Board {
         return bombs;
     }
 
-    createSurrounding = (bombs) => {
+    #createSurrounding = (bombs) => {
         let surroundings = [...Array(this.height)].map(x=>Array(this.width).fill(false))
 
         for (let i = 0; i < this.height; i++){
@@ -53,14 +54,18 @@ class Board {
         
     }
 
-    createClicks = () => {
+    #createClicks = () => {
         let clicks = [...Array(this.height)].map(x=>Array(this.width).fill(false))
         return clicks;
     }
 
-    createFlags = () => {
-        let flags = [...Array(this.height)].map(x=>Array(this.width).fill(false))
+    #createFlags = () => {
+        let flags = [...Array(this.height)].map(x=>Array(this.width).fill(0))
         return flags;
+    }
+
+    addClient = (client) => {
+        this.clients.push(client);
     }
 }
 

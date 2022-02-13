@@ -34,11 +34,14 @@ wss.on('connection', (client) => {
             case 0:
                 let id = Math.floor(Math.random() * 1000);
                 coopGames[id] = new Board(id, message.body.width, message.body.height, message.body.bombs);
+                //coopGames[id].addClient(client)
                 //client['userData'] = { name: message.body.name, gameId: id }
                 client.send(JSON.stringify({ messageType: 0, body: { id: id } }));
                 break;
             case 1:
-                client['userData'] = { name: message.body.name, gameId: message.body.id }
+                coopGames[message.body.id].addClient(client)
+                client['userData'] = { name: message.body.name, gameId: message.body.id, color: coopGames[message.body.id].clients.length }
+                
                 client.send(JSON.stringify({
                     messageType: 1, body: {
                         bombs: coopGames[message.body.id].bombs,
@@ -81,7 +84,12 @@ wss.on('connection', (client) => {
                 let xFlag = message.body.x;
                 let yFlag = message.body.y;
                 console.log('here')
-                coopGames[message.body.id].flags[yFlag][xFlag] = !coopGames[message.body.id].flags[yFlag][xFlag];
+                if (coopGames[message.body.id].flags[yFlag][xFlag] == 0){
+                    coopGames[message.body.id].flags[yFlag][xFlag] = client['userData']['color'];
+                } else {
+                    coopGames[message.body.id].flags[yFlag][xFlag] = 0;
+                }
+                //coopGames[message.body.id].flags[yFlag][xFlag] = !coopGames[message.body.id].flags[yFlag][xFlag];
                 wss.clients.forEach(_client => {
                     if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {
                         _client.send(JSON.stringify({
