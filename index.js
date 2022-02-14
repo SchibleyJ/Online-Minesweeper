@@ -62,6 +62,11 @@ wss.on('connection', (client) => {
                 let yClick = message.body.y;
                 if (!coopGames[message.body.id].clicks[yClick][xClick] && !coopGames[message.body.id].flags[yClick][xClick]) {
                     console.log('here')
+                    if (coopGames[message.body.id].firstTurn){
+                        coopGames[message.body.id].firstTurn = false;
+                        coopGames[message.body.id].createBombs(xClick, yClick);
+                        coopGames[message.body.id].createSurrounding(coopGames[message.body.id].bombs)
+                    }
                     floodFill(xClick, yClick, coopGames[message.body.id].clicks, coopGames[message.body.id].surroundings)
                     wss.clients.forEach(_client => {
                         if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {

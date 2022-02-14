@@ -171,7 +171,7 @@ function drawSquare(x, y) {
     let sprite = new Image;
     if (!isClicked){
         if (flag !== 0){
-            sprite.src = `/sprites/TileFlag${flag}.png`;
+            sprite.src = `/sprites/TileFlag${flag % 7}.png`;
         } else {
             sprite.src = '/sprites/TileUnknown.png';
         }

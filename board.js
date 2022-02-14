@@ -4,33 +4,33 @@ class Board {
         this.width = width;
         this.height = height;
         this.numBombs = bombs;
-        this.bombs = this.#createBombs();
-        this.surroundings = this.#createSurrounding(this.bombs);
+        this.bombs = [...Array(this.height)].map(x=>Array(this.width).fill(false));
+        this.surroundings = [...Array(this.height)].map(x=>Array(this.width).fill(0));
         this.clicks = this.#createClicks();
         this.flags = this.#createFlags();
         this.clients = [];
-
+        this.firstTurn = true;
 
     }
 
     
-    #createBombs = () => {
+    createBombs = (x, y) => {
         let bombs = [...Array(this.height)].map(x=>Array(this.width).fill(false))
 
         for (let i = 0; i < this.numBombs; i++){
             let ranX = Math.floor(Math.random() * this.width);
             let ranY = Math.floor(Math.random() * this.height);
-            if (bombs[ranY][ranX]){
+            if (bombs[ranY][ranX] || (Math.abs(ranY - y) <= 1 && Math.abs(ranX - x) <= 1)){
                 i--;
                 continue;
             } else {
                 bombs[ranY][ranX] = true;
             }
         }
-        return bombs;
+        this.bombs = bombs;
     }
 
-    #createSurrounding = (bombs) => {
+    createSurrounding = (bombs) => {
         let surroundings = [...Array(this.height)].map(x=>Array(this.width).fill(false))
 
         for (let i = 0; i < this.height; i++){
@@ -38,7 +38,7 @@ class Board {
                 surroundings[i][j] = this.#singleSurrounding(bombs, j, i)
             }
         }
-        return surroundings;
+        this.surroundings = surroundings;
     }
 
     #singleSurrounding = (bombs, x, y) => {
