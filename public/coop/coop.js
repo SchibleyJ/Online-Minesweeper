@@ -205,7 +205,6 @@ temp.onload = function () {
 function loadImage(src) {
     return new Promise( (resolve) => {
         const sprite = new Image();
-        //borderSprites.push(sprite);
         sprite.onload = () => {
             resolve(sprite);
         }
