@@ -1,8 +1,6 @@
 //https://stackoverflow.com/questions/1738128/minesweeper-solving-algorithm
 
 /* TODO
-implement starting fixes from link above
-add colored flags based on player
 add num of mines remaining (based on flags put down)
 add timer
 consider solvable board (starting with above link)

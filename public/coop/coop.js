@@ -130,10 +130,15 @@ const setName = () => {
 const canv = document.getElementById('board');
 const ctx = canv.getContext('2d');
 
-const loadBoard = () => {
-    ctx.rect(100, 100, 600, 320);
-    ctx.stroke();
+const VERTICAL_MARGIN = 100;
+const HORIZONTAL_MARGIN = 100;
+const SQUARE_SIZE = 20;
+const BORDER_SIZE = 0.625 * SQUARE_SIZE;
 
+setTimeout(() => {
+    loadImages();
+}, 1000)
+const loadBoard = () => {
     for (let i = 0; i < boardWidth; i++) {
         for (let j = 0; j < boardHeight; j++) {
             drawSquare(i, j);
@@ -150,15 +155,17 @@ canv.addEventListener('mousedown', (event) => {
     let mouseX = (event.clientX - rect.left) * scaleX;   // scale mouse coordinates after they have
     let mouseY = (event.clientY - rect.top) * scaleY;     // been adjusted to be relative to element
 
-    let x = Math.floor((mouseX - 100) / 20);
-    let y = Math.floor((mouseY - 100) / 20);
-    if (event.button === 0){
-        ws.send(JSON.stringify({messageType: 3, body: {id: code, x: x, y: y}}))
+    let x = Math.floor((mouseX - HORIZONTAL_MARGIN) / SQUARE_SIZE);
+    let y = Math.floor((mouseY - VERTICAL_MARGIN) / SQUARE_SIZE);
+    if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight) {
+        if (event.button === 0) {
+            ws.send(JSON.stringify({ messageType: 3, body: { id: code, x: x, y: y } }))
+        }
+        if (event.button === 2) {
+            ws.send(JSON.stringify({ messageType: 4, body: { id: code, x: x, y: y } }))
+        }
     }
-    if (event.button === 2){
-        ws.send(JSON.stringify({messageType: 4, body: {id: code, x: x, y: y}}))
-    }
-    
+
 })
 
 
@@ -169,22 +176,79 @@ function drawSquare(x, y) {
     let surrouding = surroundings[y][x];
     let flag = flags[y][x];
     let sprite = new Image;
-    if (!isClicked){
-        if (flag !== 0){
+    if (!isClicked) {
+        if (flag !== 0) {
             sprite.src = `/sprites/TileFlag${flag % 7}.png`;
         } else {
             sprite.src = '/sprites/TileUnknown.png';
         }
     } else if (isBomb) {
-            sprite.src = '/sprites/TileMine.png';
+        sprite.src = '/sprites/TileMine.png';
     } else {
         sprite.src = `/sprites/Tile${surrouding}.png`;
     }
 
     sprite.onload = () => {
-        ctx.drawImage(sprite, x * 20 + 100, y * 20 + 100, 20, 20)
+        ctx.drawImage(sprite, x * SQUARE_SIZE + HORIZONTAL_MARGIN, y * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, SQUARE_SIZE)
     }
 }
+
+
+
+function loadImages() {
+    let sprites = [];
+    for (let i = 1; i < 9; i++) {
+        const sprite = new Image;
+        sprite.src = `/sprites/Border${i}.png`;
+        sprites.push(sprite);
+    }
+    for (let i = 0; i < sprites.length; i++){
+        sprites[i].onload = () => {
+            console.log('here' + i);
+            drawHelper(sprites)
+        }
+    }
+   
+}
+
+
+function drawHelper(sprites) {
+    console.log('here')
+    //middle left "corner"
+    ctx.drawImage(sprites[6], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+
+    //middle right "corner"
+    ctx.drawImage(sprites[7], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+
+    //bottm left corner
+    ctx.drawImage(sprites[2], HORIZONTAL_MARGIN - BORDER_SIZE, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
+
+    //bottom right corner
+    ctx.drawImage(sprites[3], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
+
+    //top/bottom wall
+    for (let i = 0; i < boardWidth; i++) {
+        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
+
+    }
+
+    //left/right wall   
+    for (let i = 0; i < boardHeight; i++) {
+        ctx.drawImage(sprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
+        ctx.drawImage(sprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
+    }
+    ctx.drawImage(sprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
+    ctx.drawImage(sprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
+
+    ctx.drawImage(sprites[0], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(sprites[1], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+
+    ctx.fillStyle = "#c0c0c0";
+    ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
+}
+
 
 
 function getCookie(name) {
