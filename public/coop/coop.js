@@ -17,7 +17,7 @@ let clicks;
 let flags;
 let boardWidth;
 let boardHeight;
-
+let initialDraw = true;
 
 const createGameCss = () => {
     createModal.style.display = 'block';
@@ -48,7 +48,6 @@ window.onclick = function (event) {
 
 ws.onopen = () => {
     console.log('ws opened')
-
     if (code === null) {
         document.getElementById('start').classList.remove('hidden')
     } else {
@@ -72,7 +71,9 @@ ws.onmessage = (e) => {
             flags = message.body.flags;
             boardWidth = message.body.width;
             boardHeight = message.body.height;
-
+            if (initialDraw){
+                drawBorder();
+            }
             loadBoard();
             break;
         case 2:
@@ -122,6 +123,7 @@ const setName = () => {
     let name = document.getElementById('name').value;
     ws.send(JSON.stringify({ messageType: 1, body: { name: name, id: code } }))
     nameModal.style.display = "none";
+            
 }
 // GAME
 
@@ -135,18 +137,17 @@ const HORIZONTAL_MARGIN = 100;
 const SQUARE_SIZE = 20;
 const BORDER_SIZE = 0.625 * SQUARE_SIZE;
 
-setTimeout(() => {
-    loadImages();
-}, 1000)
-const loadBoard = () => {
+
+
+function loadBoard() {
     for (let i = 0; i < boardWidth; i++) {
         for (let j = 0; j < boardHeight; j++) {
             drawSquare(i, j);
         }
     }
     ctx.stroke();
-
 }
+
 
 canv.addEventListener('mousedown', (event) => {
     let rect = canv.getBoundingClientRect(); // abs. size of element
@@ -193,62 +194,80 @@ function drawSquare(x, y) {
     }
 }
 
+const temp = new Image();
 
-
-function loadImages() {
-    let sprites = [];
-    for (let i = 1; i < 9; i++) {
-        const sprite = new Image;
-        sprite.src = `/sprites/Border${i}.png`;
-        sprites.push(sprite);
-    }
-    for (let i = 0; i < sprites.length; i++){
-        sprites[i].onload = () => {
-            console.log('here' + i);
-            drawHelper(sprites)
-        }
-    }
-   
+temp.onload = function () {
+    temp.src = `/sprites/Border4.png`;
+    ctx.drawImage(temp, boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
 }
 
 
-function drawHelper(sprites) {
-    console.log('here')
-    //middle left "corner"
-    ctx.drawImage(sprites[6], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+function loadImage(src) {
+    return new Promise( (resolve) => {
+        const sprite = new Image();
+        //borderSprites.push(sprite);
+        sprite.onload = () => {
+            resolve(sprite);
+        }
+        sprite.src = src;
+    })
+};
 
-    //middle right "corner"
-    ctx.drawImage(sprites[7], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+function drawBorder() {
+    Promise
+    .all([
+        loadImage(`/sprites/Border1.png`),
+        loadImage(`/sprites/Border2.png`),
+        loadImage(`/sprites/Border3.png`),
+        loadImage(`/sprites/Border4.png`),
+        loadImage(`/sprites/Border5.png`),
+        loadImage(`/sprites/Border6.png`),
+        loadImage(`/sprites/Border7.png`),
+        loadImage(`/sprites/Border8.png`),
+    ]).then( (borderSprites) => {
+        drawBorderSprites(borderSprites);
+    })
+}
 
+
+function drawBorderSprites(borderSprites) {
+    ctx.fillStyle = "#c0c0c0";
+    ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
+    console.log(borderSprites)
+    
     //bottm left corner
-    ctx.drawImage(sprites[2], HORIZONTAL_MARGIN - BORDER_SIZE, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(borderSprites[2], HORIZONTAL_MARGIN - BORDER_SIZE, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
 
     //bottom right corner
-    ctx.drawImage(sprites[3], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(borderSprites[3], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
 
     //top/bottom wall
     for (let i = 0; i < boardWidth; i++) {
-        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
-        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, BORDER_SIZE)
-        ctx.drawImage(sprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
 
     }
 
     //left/right wall   
     for (let i = 0; i < boardHeight; i++) {
-        ctx.drawImage(sprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
-        ctx.drawImage(sprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
+        ctx.drawImage(borderSprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
+        ctx.drawImage(borderSprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
     }
-    ctx.drawImage(sprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
-    ctx.drawImage(sprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
+    ctx.drawImage(borderSprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
+    ctx.drawImage(borderSprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
 
-    ctx.drawImage(sprites[0], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
-    ctx.drawImage(sprites[1], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(borderSprites[0], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(borderSprites[1], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
 
-    ctx.fillStyle = "#c0c0c0";
-    ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
+    //middle left "corner"
+    ctx.drawImage(borderSprites[6], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+
+    //middle right "corner"
+    ctx.drawImage(borderSprites[7], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+
+   
 }
-
 
 
 function getCookie(name) {
