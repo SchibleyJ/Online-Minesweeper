@@ -105,8 +105,9 @@ class Board {
                 }
             }
         }
-        if (this.numBombs == numNotClicked) {
+        if (this.numBombs == numNotClicked && this.winState == 0) {
             this.winState = 1;
+            this.numFlags = this.numBombs;
             for (let i = 0; i < this.bombs.length; i++) {
                 for (let j = 0; j < this.bombs[0].length; j++) {
                     if (this.bombs[i][j] && this.flags[i][j] == 0){
