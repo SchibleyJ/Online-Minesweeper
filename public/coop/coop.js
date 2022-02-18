@@ -12,11 +12,15 @@ let closeCreate = document.getElementById("close-create");
 let closeJoin = document.getElementById("close-join");
 
 let bombs;
+let numBombs;
+let numFlags;
 let surroundings;
 let clicks;
 let flags;
 let boardWidth;
 let boardHeight;
+let seconds = 0;
+let winState;
 let initialDraw = true;
 
 const createGameCss = () => {
@@ -65,12 +69,15 @@ ws.onmessage = (e) => {
             break;
         case 1:
             console.log(message.body);
+            numBombs = message.body.numBombs;
+            numFlags = message.body.numFlags;
             bombs = message.body.bombs;
             surroundings = message.body.surroundings;
             clicks = message.body.clicks;
             flags = message.body.flags;
             boardWidth = message.body.width;
             boardHeight = message.body.height;
+            winState = message.body.winState;
             if (initialDraw){
                 drawBorder();
             }
@@ -85,6 +92,9 @@ ws.onmessage = (e) => {
                 nameModal.style.display = 'block';
             }
             break;
+        case 3:
+            seconds = message.body.seconds;
+            updateTime();
 
     }
 }
@@ -145,9 +155,26 @@ function loadBoard() {
             drawSquare(i, j);
         }
     }
+    ctx.fillStyle = "#c0c0c0";
+    ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
+    ctx.fillStyle = "red"
+    ctx.font = '40px Arial'
+    ctx.fillText(numBombs - numFlags, HORIZONTAL_MARGIN + BORDER_SIZE + (boardWidth / 4), VERTICAL_MARGIN - SQUARE_SIZE)
+    ctx.fillText(seconds, HORIZONTAL_MARGIN + BORDER_SIZE + (5 * SQUARE_SIZE), VERTICAL_MARGIN - SQUARE_SIZE)
     ctx.stroke();
 }
 
+function updateTime(){
+    console.log(HORIZONTAL_MARGIN + (boardWidth / 2), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - ( boardWidth / 2), 2 * SQUARE_SIZE);
+    
+    ctx.fillStyle = "#c0c0c0";
+    ctx.fillRect(HORIZONTAL_MARGIN + (boardWidth / 2) + (5 * SQUARE_SIZE), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - (5 * SQUARE_SIZE) - 5, 2 * SQUARE_SIZE);
+    ctx.fillStyle = "red"
+    ctx.font = '40px Arial'
+    ctx.fillText(seconds, HORIZONTAL_MARGIN + BORDER_SIZE + (5 * SQUARE_SIZE), VERTICAL_MARGIN - SQUARE_SIZE)
+    ctx.stroke();
+
+}
 
 canv.addEventListener('mousedown', (event) => {
     let rect = canv.getBoundingClientRect(); // abs. size of element
@@ -224,15 +251,13 @@ function drawBorder() {
         loadImage(`/sprites/Border7.png`),
         loadImage(`/sprites/Border8.png`),
     ]).then( (borderSprites) => {
+        initialDraw = false;
         drawBorderSprites(borderSprites);
     })
 }
 
 
 function drawBorderSprites(borderSprites) {
-    ctx.fillStyle = "#c0c0c0";
-    ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
-    console.log(borderSprites)
     
     //bottm left corner
     ctx.drawImage(borderSprites[2], HORIZONTAL_MARGIN - BORDER_SIZE, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
@@ -244,7 +269,7 @@ function drawBorderSprites(borderSprites) {
     for (let i = 0; i < boardWidth; i++) {
         ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
         ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, BORDER_SIZE)
-        ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, SQUARE_SIZE, BORDER_SIZE)
+        ctx.drawImage(borderSprites[4], i * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - (2 * BORDER_SIZE), SQUARE_SIZE, BORDER_SIZE)
 
     }
 
@@ -253,11 +278,12 @@ function drawBorderSprites(borderSprites) {
         ctx.drawImage(borderSprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
         ctx.drawImage(borderSprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, i * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, SQUARE_SIZE)
     }
-    ctx.drawImage(borderSprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
-    ctx.drawImage(borderSprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE), BORDER_SIZE, 2 * SQUARE_SIZE)
+    ctx.drawImage(borderSprites[5], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, 2 * SQUARE_SIZE)
+    ctx.drawImage(borderSprites[5], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, 2 * SQUARE_SIZE)
 
-    ctx.drawImage(borderSprites[0], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
-    ctx.drawImage(borderSprites[1], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
+    //top leftright
+    ctx.drawImage(borderSprites[0], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - (2 * BORDER_SIZE), BORDER_SIZE, BORDER_SIZE)
+    ctx.drawImage(borderSprites[1], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - (2 * BORDER_SIZE), BORDER_SIZE, BORDER_SIZE)
 
     //middle left "corner"
     ctx.drawImage(borderSprites[6], HORIZONTAL_MARGIN - BORDER_SIZE, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)

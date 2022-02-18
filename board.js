@@ -4,13 +4,17 @@ class Board {
         this.width = width;
         this.height = height;
         this.numBombs = bombs;
+        this.numFlags = 0;
         this.bombs = [...Array(this.height)].map(x=>Array(this.width).fill(false));
         this.surroundings = [...Array(this.height)].map(x=>Array(this.width).fill(0));
         this.clicks = this.#createClicks();
         this.flags = this.#createFlags();
         this.clients = [];
         this.firstTurn = true;
-
+        this.timer;
+        this.seconds = 0;
+        //0 is still going, 1 is win, 2 is loss
+        this.winState = 0;
     }
 
     
@@ -66,6 +70,43 @@ class Board {
 
     addClient = (client) => {
         this.clients.push(client);
+    }
+
+    updateFlagCount = () => {
+        let total = 0;
+        for (let i = 0; i < this.height; i++){
+            for (let j = 0; j < this.width; j++){
+                if (this.flags[i] && this.flags[i][j]) {
+                    total++;
+                }
+            }
+        }
+        this.numFlags = total;
+    }
+
+    startTimer = (fn, id) => {
+        this.timer = setInterval(fn, 1000, id);
+    }
+
+    endTimer = () => {
+        clearInterval(this.timer);
+    }
+
+    checkGameOver = () => {
+        let numNotClicked = 0;
+        for (let i = 0; i < this.bombs.length; i++){
+            for (let j = 0; j < this.bombs[0].length; j++){
+                if (this.clicks[i][j] && this.bombs[i][j]){
+                    this.winState = 2;
+                }
+                if (!this.clicks[i][j]){
+                    numNotClicked++;
+                }
+            }
+        }
+        if (this.numBombs == numNotClicked){
+            this.winState = 1;
+        }
     }
 }
 

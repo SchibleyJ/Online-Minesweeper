@@ -40,16 +40,8 @@ wss.on('connection', (client) => {
                 coopGames[message.body.id].addClient(client)
                 client['userData'] = { name: message.body.name, gameId: message.body.id, color: coopGames[message.body.id].clients.length }
                 
-                client.send(JSON.stringify({
-                    messageType: 1, body: {
-                        bombs: coopGames[message.body.id].bombs,
-                        surroundings: coopGames[message.body.id].surroundings,
-                        clicks: coopGames[message.body.id].clicks,
-                        flags: coopGames[message.body.id].flags,
-                        width: coopGames[message.body.id].width,
-                        height: coopGames[message.body.id].height
-                    }
-                }));
+                
+                sendBoard(message.body.id);
 
                 break;
             case 2:
@@ -63,23 +55,14 @@ wss.on('connection', (client) => {
                     if (coopGames[message.body.id].firstTurn){
                         coopGames[message.body.id].firstTurn = false;
                         coopGames[message.body.id].createBombs(xClick, yClick);
-                        coopGames[message.body.id].createSurrounding(coopGames[message.body.id].bombs)
+                        coopGames[message.body.id].createSurrounding(coopGames[message.body.id].bombs);
+                        coopGames[message.body.id].startTimer(timerFunction, message.body.id);
                     }
-                    floodFill(xClick, yClick, coopGames[message.body.id].clicks, coopGames[message.body.id].surroundings)
-                    wss.clients.forEach(_client => {
-                        if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {
-                            _client.send(JSON.stringify({
-                                messageType: 1, body: {
-                                    bombs: coopGames[message.body.id].bombs,
-                                    surroundings: coopGames[message.body.id].surroundings,
-                                    clicks: coopGames[message.body.id].clicks,
-                                    flags: coopGames[message.body.id].flags,
-                                    width: coopGames[message.body.id].width,
-                                    height: coopGames[message.body.id].height
-                                }
-                            }));
-                        }
-                    })
+                    floodFill(xClick, yClick, coopGames[message.body.id].clicks, coopGames[message.body.id].surroundings, coopGames[message.body.id].flags);
+                    coopGames[message.body.id].updateFlagCount();
+                    coopGames[message.body.id].checkGameOver();
+                    
+                sendBoard(message.body.id);
 
                 }
                 break;
@@ -87,27 +70,19 @@ wss.on('connection', (client) => {
                 let xFlag = message.body.x;
                 let yFlag = message.body.y;
                 console.log('here')
-                if (coopGames[message.body.id].flags[yFlag][xFlag] == 0){
-                    coopGames[message.body.id].flags[yFlag][xFlag] = client['userData']['color'];
-                } else {
-                    coopGames[message.body.id].flags[yFlag][xFlag] = 0;
-                }
-                //coopGames[message.body.id].flags[yFlag][xFlag] = !coopGames[message.body.id].flags[yFlag][xFlag];
-                wss.clients.forEach(_client => {
-                    if (_client['userData'] && _client['userData']['gameId'] == message.body.id) {
-                        _client.send(JSON.stringify({
-                            messageType: 1, body: {
-                                bombs: coopGames[message.body.id].bombs,
-                                surroundings: coopGames[message.body.id].surroundings,
-                                clicks: coopGames[message.body.id].clicks,
-                                flags: coopGames[message.body.id].flags,
-                                width: coopGames[message.body.id].width,
-                                height: coopGames[message.body.id].height
-                            }
-                        }));
+                if (!coopGames[message.body.id].clicks[yFlag][xFlag]){
+                    if (coopGames[message.body.id].flags[yFlag][xFlag] == 0){
+                        coopGames[message.body.id].flags[yFlag][xFlag] = client['userData']['color'];
+                        coopGames[message.body.id].numFlags++;
+                    } else {
+                        coopGames[message.body.id].flags[yFlag][xFlag] = 0;
+                        coopGames[message.body.id].numFlags--;
                     }
-                })
-
+                    sendBoard(message.body.id);
+                }
+                
+                
+                sendBoard(message.body.id);
                 break;
 
 
@@ -118,6 +93,45 @@ wss.on('connection', (client) => {
     })
 
 })
+
+const sendBoard = (id) => {
+    wss.clients.forEach(_client => {
+        if (_client['userData'] && _client['userData']['gameId'] == id) {
+            _client.send(JSON.stringify({
+                messageType: 1, body: {
+                    numBombs: coopGames[id].numBombs,
+                    numFlags: coopGames[id].numFlags,
+                    bombs: coopGames[id].bombs,
+                    surroundings: coopGames[id].surroundings,
+                    clicks: coopGames[id].clicks,
+                    flags: coopGames[id].flags,
+                    width: coopGames[id].width,
+                    height: coopGames[id].height,
+                    seconds: coopGames[id].seconds,
+                    gameOver: coopGames[id].winState
+                }
+            }));
+        }
+    })
+}
+
+const sendTime = (id) => {
+    wss.clients.forEach(_client => {
+        if (_client['userData'] && _client['userData']['gameId'] == id) {
+            _client.send(JSON.stringify({
+                messageType: 3, body: {
+                    seconds: coopGames[id].seconds
+                }
+            }));
+        }
+    })
+}
+
+const timerFunction = (id) => {
+    console.log('here')
+    coopGames[id].seconds++;
+    sendTime(id);
+}
 
 
 server.listen(port, function () {
