@@ -61,14 +61,14 @@ ws.onopen = () => {
 }
 
 ws.onmessage = (e) => {
-    console.log(e.data)
+    //console.log(e.data)
     const message = JSON.parse(e.data);
     switch (message.messageType) {
         case 0:
             window.location.href = `${location.href}?id=${message.body.id}`;
             break;
         case 1:
-            console.log(message.body);
+            //console.log(message.body);
             numBombs = message.body.numBombs;
             numFlags = message.body.numFlags;
             bombs = message.body.bombs;
@@ -78,6 +78,8 @@ ws.onmessage = (e) => {
             boardWidth = message.body.width;
             boardHeight = message.body.height;
             winState = message.body.winState;
+            seconds = message.body.seconds;
+            console.log(message.body.winState)
             if (initialDraw){
                 drawBorder();
             }
@@ -132,8 +134,12 @@ const joinGame = () => {
 const setName = () => {
     let name = document.getElementById('name').value;
     ws.send(JSON.stringify({ messageType: 1, body: { name: name, id: code } }))
-    nameModal.style.display = "none";
-            
+    nameModal.style.display = "none";       
+}
+
+const resetGame = () => {
+    ws.send(JSON.stringify({ messageType: 5, body: {id: code } }))
+
 }
 // GAME
 
@@ -162,10 +168,18 @@ function loadBoard() {
     ctx.fillText(numBombs - numFlags, HORIZONTAL_MARGIN + BORDER_SIZE + (boardWidth / 4), VERTICAL_MARGIN - SQUARE_SIZE)
     ctx.fillText(seconds, HORIZONTAL_MARGIN + BORDER_SIZE + (5 * SQUARE_SIZE), VERTICAL_MARGIN - SQUARE_SIZE)
     ctx.stroke();
+    switch(winState){
+        case 1:
+            console.log("YOU WIN")
+            break;
+        case 2:
+            console.log("YOU LOSE")
+            break;
+    }
 }
 
 function updateTime(){
-    console.log(HORIZONTAL_MARGIN + (boardWidth / 2), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - ( boardWidth / 2), 2 * SQUARE_SIZE);
+    //console.log(HORIZONTAL_MARGIN + (boardWidth / 2), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - ( boardWidth / 2), 2 * SQUARE_SIZE);
     
     ctx.fillStyle = "#c0c0c0";
     ctx.fillRect(HORIZONTAL_MARGIN + (boardWidth / 2) + (5 * SQUARE_SIZE), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - (5 * SQUARE_SIZE) - 5, 2 * SQUARE_SIZE);
@@ -185,7 +199,7 @@ canv.addEventListener('mousedown', (event) => {
 
     let x = Math.floor((mouseX - HORIZONTAL_MARGIN) / SQUARE_SIZE);
     let y = Math.floor((mouseY - VERTICAL_MARGIN) / SQUARE_SIZE);
-    if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight) {
+    if (x >= 0 && x < boardWidth && y >= 0 && y < boardHeight && winState == 0) {
         if (event.button === 0) {
             ws.send(JSON.stringify({ messageType: 3, body: { id: code, x: x, y: y } }))
         }

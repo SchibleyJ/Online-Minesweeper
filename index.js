@@ -51,7 +51,7 @@ wss.on('connection', (client) => {
                 let xClick = message.body.x;
                 let yClick = message.body.y;
                 if (!coopGames[message.body.id].clicks[yClick][xClick] && !coopGames[message.body.id].flags[yClick][xClick]) {
-                    console.log('here')
+                    //console.log('here')
                     if (coopGames[message.body.id].firstTurn){
                         coopGames[message.body.id].firstTurn = false;
                         coopGames[message.body.id].createBombs(xClick, yClick);
@@ -84,11 +84,13 @@ wss.on('connection', (client) => {
                 
                 sendBoard(message.body.id);
                 break;
-
-
-
-
+            case 5:
+                coopGames[message.body.id].resetGame();
+                console.log(coopGames[message.body.id].seconds)
+                sendBoard(message.body.id);
+                break;
         }
+
 
     })
 
@@ -108,7 +110,7 @@ const sendBoard = (id) => {
                     width: coopGames[id].width,
                     height: coopGames[id].height,
                     seconds: coopGames[id].seconds,
-                    gameOver: coopGames[id].winState
+                    winState: coopGames[id].winState
                 }
             }));
         }
@@ -128,7 +130,6 @@ const sendTime = (id) => {
 }
 
 const timerFunction = (id) => {
-    console.log('here')
     coopGames[id].seconds++;
     sendTime(id);
 }
