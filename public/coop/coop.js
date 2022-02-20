@@ -1,7 +1,8 @@
 const code = (new URLSearchParams(window.location.search)).get('id');
 const ws = new WebSocket(`ws${location.protocol == "https:" ? 's' : ''}://${location.host}/transfer`);
 
-
+document.getElementById('codeP').innerHTML = `Code: ${code}`
+document.getElementById('copyLink').innerHTML = location.href;
 
 // CSS EDITIING
 let createModal = document.getElementById('create-modal');
@@ -22,6 +23,17 @@ let boardHeight;
 let seconds = 0;
 let winState;
 let initialDraw = true;
+
+//board constants
+const canv = document.getElementById('board');
+const ctx = canv.getContext('2d');
+
+const SQUARE_SIZE = 20;
+const BORDER_SIZE = 0.625 * SQUARE_SIZE;
+const VERTICAL_MARGIN = BORDER_SIZE + (2 * SQUARE_SIZE) + BORDER_SIZE;
+const HORIZONTAL_MARGIN = BORDER_SIZE;
+
+
 
 const createGameCss = () => {
     createModal.style.display = 'block';
@@ -80,7 +92,7 @@ ws.onmessage = (e) => {
             winState = message.body.winState;
             seconds = message.body.seconds;
             console.log(message.body.winState)
-            if (initialDraw){
+            if (initialDraw) {
                 drawBorder();
             }
             loadBoard();
@@ -134,28 +146,22 @@ const joinGame = () => {
 const setName = () => {
     let name = document.getElementById('name').value;
     ws.send(JSON.stringify({ messageType: 1, body: { name: name, id: code } }))
-    nameModal.style.display = "none";       
+    nameModal.style.display = "none";
 }
 
 const resetGame = () => {
-    ws.send(JSON.stringify({ messageType: 5, body: {id: code } }))
+    ws.send(JSON.stringify({ messageType: 5, body: { id: code } }))
 
 }
 // GAME
 
 //setup board
 
-const canv = document.getElementById('board');
-const ctx = canv.getContext('2d');
-
-const VERTICAL_MARGIN = 100;
-const HORIZONTAL_MARGIN = 100;
-const SQUARE_SIZE = 20;
-const BORDER_SIZE = 0.625 * SQUARE_SIZE;
-
 
 
 function loadBoard() {
+
+
     for (let i = 0; i < boardWidth; i++) {
         for (let j = 0; j < boardHeight; j++) {
             drawSquare(i, j);
@@ -168,7 +174,7 @@ function loadBoard() {
     ctx.fillText(numBombs - numFlags, HORIZONTAL_MARGIN + BORDER_SIZE + (boardWidth / 4), VERTICAL_MARGIN - SQUARE_SIZE)
     ctx.fillText(seconds, HORIZONTAL_MARGIN + BORDER_SIZE + (5 * SQUARE_SIZE), VERTICAL_MARGIN - SQUARE_SIZE)
     ctx.stroke();
-    switch(winState){
+    switch (winState) {
         case 1:
             console.log("YOU WIN")
             break;
@@ -178,9 +184,9 @@ function loadBoard() {
     }
 }
 
-function updateTime(){
+function updateTime() {
     //console.log(HORIZONTAL_MARGIN + (boardWidth / 2), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - ( boardWidth / 2), 2 * SQUARE_SIZE);
-    
+
     ctx.fillStyle = "#c0c0c0";
     ctx.fillRect(HORIZONTAL_MARGIN + (boardWidth / 2) + (5 * SQUARE_SIZE), VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE - (5 * SQUARE_SIZE) - 5, 2 * SQUARE_SIZE);
     ctx.fillStyle = "red"
@@ -231,48 +237,61 @@ function drawSquare(x, y) {
     }
 
     sprite.onload = () => {
+        console.log(sprite)
         ctx.drawImage(sprite, x * SQUARE_SIZE + HORIZONTAL_MARGIN, y * SQUARE_SIZE + VERTICAL_MARGIN, SQUARE_SIZE, SQUARE_SIZE)
+        
+    }
+    sprite.onerror = () => {
+        console.log(x, y, sprite.src)
+        drawSquare(x, y);
     }
 }
 
-const temp = new Image();
-
-temp.onload = function () {
-    temp.src = `/sprites/Border4.png`;
-    ctx.drawImage(temp, boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
-}
 
 
 function loadImage(src) {
-    return new Promise( (resolve) => {
+    return new Promise((resolve) => {
         const sprite = new Image();
         sprite.onload = () => {
             resolve(sprite);
         }
+        
         sprite.src = src;
     })
 };
 
 function drawBorder() {
     Promise
-    .all([
-        loadImage(`/sprites/Border1.png`),
-        loadImage(`/sprites/Border2.png`),
-        loadImage(`/sprites/Border3.png`),
-        loadImage(`/sprites/Border4.png`),
-        loadImage(`/sprites/Border5.png`),
-        loadImage(`/sprites/Border6.png`),
-        loadImage(`/sprites/Border7.png`),
-        loadImage(`/sprites/Border8.png`),
-    ]).then( (borderSprites) => {
-        initialDraw = false;
-        drawBorderSprites(borderSprites);
-    })
+        .all([
+            loadImage(`/sprites/Border1.png`),
+            loadImage(`/sprites/Border2.png`),
+            loadImage(`/sprites/Border3.png`),
+            loadImage(`/sprites/Border4.png`),
+            loadImage(`/sprites/Border5.png`),
+            loadImage(`/sprites/Border6.png`),
+            loadImage(`/sprites/Border7.png`),
+            loadImage(`/sprites/Border8.png`),
+        ]).then((borderSprites) => {
+            canv.width = (BORDER_SIZE * 2) + (SQUARE_SIZE * boardWidth);
+            canv.height = (BORDER_SIZE * 3) + (SQUARE_SIZE * boardHeight) + (SQUARE_SIZE * 2);
+            canv.style.width = `${canv.width}px`;
+            canv.style.height = `${canv.height}px`;
+            initialDraw = false;
+            ctx.fillStyle = "#c0c0c0";
+            ctx.fillRect(HORIZONTAL_MARGIN, VERTICAL_MARGIN - (2 * SQUARE_SIZE) - BORDER_SIZE, boardWidth * SQUARE_SIZE, 2 * SQUARE_SIZE);
+            ctx.fillStyle = "red"
+            ctx.font = '40px Arial'
+            ctx.fillText(numBombs - numFlags, HORIZONTAL_MARGIN + BORDER_SIZE + (boardWidth / 4), VERTICAL_MARGIN - SQUARE_SIZE)
+            ctx.fillText(seconds, HORIZONTAL_MARGIN + BORDER_SIZE + (5 * SQUARE_SIZE), VERTICAL_MARGIN - SQUARE_SIZE)
+            ctx.stroke();
+
+            drawBorderSprites(borderSprites);
+        })
 }
 
 
 function drawBorderSprites(borderSprites) {
-    
+
     //bottm left corner
     ctx.drawImage(borderSprites[2], HORIZONTAL_MARGIN - BORDER_SIZE, boardHeight * SQUARE_SIZE + VERTICAL_MARGIN, BORDER_SIZE, BORDER_SIZE)
 
@@ -305,7 +324,7 @@ function drawBorderSprites(borderSprites) {
     //middle right "corner"
     ctx.drawImage(borderSprites[7], boardWidth * SQUARE_SIZE + HORIZONTAL_MARGIN, VERTICAL_MARGIN - BORDER_SIZE, BORDER_SIZE, BORDER_SIZE)
 
-   
+
 }
 
 
@@ -318,4 +337,9 @@ function getCookie(name) {
         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
+}
+
+function copy(){
+    const link = document.getElementById('copyLink').innerHTML;
+    navigator.clipboard.writeText(link);
 }

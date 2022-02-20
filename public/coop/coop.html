@@ -76,10 +76,12 @@
         </div>
     </div>
     <div id='game' class='hidden'>
-        <canvas id='board' width='800px' height='520px' oncontextmenu="event.preventDefault()">
+        <canvas id='board' oncontextmenu="event.preventDefault()">
 
         </canvas>
         <button onclick="resetGame()">RESET</button>
+        <p id='codeP'>Code: </p>
+        <textarea readonly id="copyLink">test</textarea><button onclick="copy()"><img src="/sprites/copyIcon.png"></button>
     </div>
 </body>
 <script src="coop.js"></script>
