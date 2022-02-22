@@ -2,25 +2,26 @@ const Game = require('./game.js');
 
 class CoopGame extends Game {
     constructor(newId, width, height, bombs) {
-        this.id = newId;
-        this.width = width;
-        this.height = height;
-        this.numBombs = bombs;
+        super(newId, width, height, bombs)
+        //this.id = newId;
+        //this.width = width;
+        //this.height = height;
+        //this.numBombs = bombs;
         this.numFlags = 0;
-        this.bombs = [...Array(this.height)].map(x => Array(this.width).fill(false));
-        this.surroundings = [...Array(this.height)].map(x => Array(this.width).fill(0));
+        //this.bombs = [...Array(this.height)].map(x => Array(this.width).fill(false));
+        //this.surroundings = [...Array(this.height)].map(x => Array(this.width).fill(0));
         this.clicks = this.#createClicks();
         this.flags = this.#createFlags();
-        this.clients = [];
+        //this.clients = [];
         this.firstTurn = true;
-        this.timer;
-        this.seconds = 0;
+        //this.timer;
+        //this.seconds = 0;
         //0 is still going, 1 is win, 2 is loss
         this.winState = 0;
     }
 
 
-    createBombs = (x, y) => {
+    /*createBombs = (x, y) => {
         let bombs = [...Array(this.height)].map(x => Array(this.width).fill(false))
 
         for (let i = 0; i < this.numBombs; i++) {
@@ -45,9 +46,9 @@ class CoopGame extends Game {
             }
         }
         this.surroundings = surroundings;
-    }
+    }*/
 
-    #singleSurrounding = (bombs, x, y) => {
+    /*#singleSurrounding = (bombs, x, y) => {
         let total = 0;
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
@@ -58,7 +59,7 @@ class CoopGame extends Game {
         }
         return total;
 
-    }
+    }*/
 
     #createClicks = () => {
         let clicks = [...Array(this.height)].map(x => Array(this.width).fill(false))
@@ -70,9 +71,9 @@ class CoopGame extends Game {
         return flags;
     }
 
-    addClient = (client) => {
+    /*addClient = (client) => {
         this.clients.push(client);
-    }
+    }*/
 
     updateFlagCount = () => {
         let total = 0;
@@ -86,13 +87,13 @@ class CoopGame extends Game {
         this.numFlags = total;
     }
 
-    startTimer = (fn, id) => {
+    /*startTimer = (fn, id) => {
         this.timer = setInterval(fn, 1000, id);
     }
 
     endTimer = () => {
         clearInterval(this.timer);
-    }
+    }*/
 
     checkGameOver = () => {
         let numNotClicked = 0;
@@ -134,3 +135,6 @@ class CoopGame extends Game {
         this.winState = 0;
     }
 }
+
+
+module.exports = CoopGame;

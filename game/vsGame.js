@@ -1,35 +1,27 @@
-/*things handled by a parent class (both coop and vs):
+const Game = require('./game.js');
 
--specifics of board (ie id, width, height, numBombs)
--clients
--bombs map
--surroundings map
--timer (maybe?)
-
-
-*/
-
-class Game {
+class VsGame extends Game {
     constructor(newId, width, height, bombs) {
-        this.id = newId;
-        this.width = width;
-        this.height = height;
-        this.numBombs = bombs;
-        //this.numFlags = 0;
-        this.bombs = [...Array(this.height)].map(x => Array(this.width).fill(false));
-        this.surroundings = [...Array(this.height)].map(x => Array(this.width).fill(0));
-        //this.clicks = this.#createClicks();
-        //this.flags = this.#createFlags();
-        this.clients = [];
-        //this.firstTurn = true;
-        this.timer;
-        this.seconds = 0;
+        super(newId, width, height, bombs)
+        //this.id = newId;
+        //this.width = width;
+        //this.height = height;
+        //this.numBombs = bombs;
+        this.numFlags = 0;
+        //this.bombs = [...Array(this.height)].map(x => Array(this.width).fill(false));
+        //this.surroundings = [...Array(this.height)].map(x => Array(this.width).fill(0));
+        this.clicks = this.#createClicks();
+        this.flags = this.#createFlags();
+        //this.clients = [];
+        this.firstTurn = true;
+        //this.timer;
+        //this.seconds = 0;
         //0 is still going, 1 is win, 2 is loss
-        //this.winState = 0;
+        this.winState = 0;
     }
 
 
-    createBombs = (x, y) => {
+    /*createBombs = (x, y) => {
         let bombs = [...Array(this.height)].map(x => Array(this.width).fill(false))
 
         for (let i = 0; i < this.numBombs; i++) {
@@ -54,9 +46,9 @@ class Game {
             }
         }
         this.surroundings = surroundings;
-    }
+    }*/
 
-    #singleSurrounding = (bombs, x, y) => {
+    /*#singleSurrounding = (bombs, x, y) => {
         let total = 0;
         for (let i = -1; i < 2; i++) {
             for (let j = -1; j < 2; j++) {
@@ -67,7 +59,7 @@ class Game {
         }
         return total;
 
-    }
+    }*/
 
     #createClicks = () => {
         let clicks = [...Array(this.height)].map(x => Array(this.width).fill(false))
@@ -79,11 +71,11 @@ class Game {
         return flags;
     }
 
-    addClient = (client) => {
+    /*addClient = (client) => {
         this.clients.push(client);
-    }
+    }*/
 
-    /*updateFlagCount = () => {
+    updateFlagCount = () => {
         let total = 0;
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
@@ -93,17 +85,17 @@ class Game {
             }
         }
         this.numFlags = total;
-    }*/
+    }
 
-    startTimer = (fn, id) => {
+    /*startTimer = (fn, id) => {
         this.timer = setInterval(fn, 1000, id);
     }
 
     endTimer = () => {
         clearInterval(this.timer);
-    }
+    }*/
 
-    /*checkGameOver = () => {
+    checkGameOver = () => {
         let numNotClicked = 0;
         for (let i = 0; i < this.bombs.length; i++) {
             for (let j = 0; j < this.bombs[0].length; j++) {
@@ -141,9 +133,8 @@ class Game {
         this.firstTurn = true;
         this.seconds = 0;
         this.winState = 0;
-    }*/
+    }
 }
 
 
-
-module.exports = Game;
+module.exports = VsGame;

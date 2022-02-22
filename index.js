@@ -15,7 +15,7 @@ const server = require('http').createServer();
 const app = require('./httpServer.js');
 const port = process.env.PORT || 8080;
 
-const Board = require('./game/game.js');
+const CoopGame = require('./game/coopGame.js');
 const floodFill = require('./floodFill.js');
 
 const coopGames = {};
@@ -31,7 +31,7 @@ wss.on('connection', (client) => {
         switch (message.messageType) {
             case 0:
                 let id = Math.floor(Math.random() * 1000);
-                coopGames[id] = new Board(id, message.body.width, message.body.height, message.body.bombs);
+                coopGames[id] = new CoopGame(id, message.body.width, message.body.height, message.body.bombs);
                 //coopGames[id].addClient(client)
                 //client['userData'] = { name: message.body.name, gameId: id }
                 client.send(JSON.stringify({ messageType: 0, body: { id: id } }));
