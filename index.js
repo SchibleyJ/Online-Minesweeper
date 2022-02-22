@@ -1,10 +1,18 @@
 //https://stackoverflow.com/questions/1738128/minesweeper-solving-algorithm
 
 /* TODO
-add num of mines remaining (based on flags put down)
-add timer
-consider solvable board (starting with above link)
 if you hate yourself, better html/css, keep the artstyle
+god i hate css truly
+
+vs mode, design how having mutliple "click/flag" boards per game will work
+might need to add userIDs to clients?  maybe the clicks can be an object of arrays
+with client IDs as keys?
+
+i could do this, or add each user linearly and just rely on indexes
+that approach doesnt work well with deleting users so i think ill go with the IDs,
+but that means i need to do more work in index.js to reformat the user interactions
+
+will also need to make real documentation for the messageTypes
 
 */
 
