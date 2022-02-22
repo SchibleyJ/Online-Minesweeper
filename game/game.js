@@ -1,4 +1,4 @@
-class Board {
+class Game {
     constructor(newId, width, height, bombs) {
         this.id = newId;
         this.width = width;
@@ -135,4 +135,4 @@ class Board {
 
 
 
-module.exports = Board;
+module.exports = Game;

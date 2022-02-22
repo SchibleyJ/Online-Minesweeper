@@ -15,7 +15,7 @@ const server = require('http').createServer();
 const app = require('./httpServer.js');
 const port = process.env.PORT || 8080;
 
-const Board = require('./board.js');
+const Board = require('./game/game.js');
 const floodFill = require('./floodFill.js');
 
 const coopGames = {};
